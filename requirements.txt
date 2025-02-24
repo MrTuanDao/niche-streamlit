@@ -1,5 +1,5 @@
 replicate
-streamlit==1.29
+streamlit==1.37.0
 requests
 streamlit-image-select
 plotly
@@ -11,3 +11,4 @@ streamlit-vis-timeline==0.3.0
 graphviz==0.20.3
 huggingface-hub
 seaborn
+bittensor==9.0.0
