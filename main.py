@@ -9,6 +9,9 @@ from huggingface_hub import snapshot_download, list_repo_files, hf_hub_download
 import os, json, random
 import graphviz
 import datetime
+import bittensor as bt
+
+metagraph = bt.metagraph(netuid=23, network="finney")
 
 st.set_page_config(page_title="SN23 Dashboard", layout="wide")
 
@@ -247,13 +250,17 @@ with tabs[0]:
             process_time = []
             success_rate = 1
             mean_process_time = 0
+        model_name = v["model_name"]
+        if model_name == "Recycle" and metagraph.stake[int(k)] > 10000:
+            model_name = "Validator"
         transformed_dict.append(
             {
                 "uid": k,
-                "model_name": v["model_name"],
+                "model_name": model_name,
                 "mean_score": (
                     sum(v["scores"]) / 10
                 ),
+                "registration_date": v.get("registration_time", ""),
                 "total_volume": v["total_volume"] if  v.get("total_volume") else 0,
                 "device_info": v.get("device_info", {}),
                 "mean_process_time": mean_process_time,
@@ -278,13 +285,16 @@ with tabs[0]:
     st.markdown("**Total Information**", unsafe_allow_html=True)
     st.dataframe(pd_data,
         width=1200,
-        column_order = ("model_name", "scores", "total_volume", "success_rate", "mean_process_time", "reward_scale", "rate_limit", "device_info"),
+        column_order = ("model_name", "scores", "registration_date", "total_volume", "success_rate", "mean_process_time", "reward_scale", "rate_limit", "device_info"),
         column_config = {
             "scores": st.column_config.ListColumn(
                 "Scores",
             ),
             "model_name": st.column_config.TextColumn(
                 "Model"
+            ),
+            "registration_date": st.column_config.DateColumn(
+                "Registration Date"
             ),
             "total_volume": st.column_config.ProgressColumn(
                 "Volume",
